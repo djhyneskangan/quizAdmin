@@ -7,7 +7,7 @@
 		const { data: quizData, error } = await supabase
 			.from('questionsTable')
 			.select('question_id, Question, optionsTable(answer_text, is_correct)')
-			.order('question_id'); //Order the questions by ID
+			.order('question_id');
 
 		if (quizData) {
 			data = quizData;
@@ -29,13 +29,12 @@
 <div class="quiz-container">
 	{#each data as question}
 		<div class="question">{question.question_id}: {question.Question}:</div>
-		<div class="answer">
-			<ol>
-				<li>{question.optionsTable[0].answer_text}</li>
-				<li>{question.optionsTable[1].answer_text}</li>
-				<li>{question.optionsTable[2].answer_text}</li>
-				<li>{question.optionsTable[3].answer_text}</li>
-			</ol>
+		<div class="answer-container">
+			{#each question.optionsTable as option}
+				<div class="answer" class:correct={option.is_correct}>
+					{option.answer_text}
+				</div>
+			{/each}
 		</div>
 	{/each}
 </div>
@@ -57,10 +56,27 @@
 		padding-top: 20px;
 	}
 
-	.answer {
+	.answer-container {
 		display: flex;
-		align-items: center;
-		margin-bottom: 8px;
+		flex-wrap: wrap;
+		gap: 10px; /* Adjust the gap between answers as needed */
+	}
+
+	.answer {
+		flex: 1;
+		padding: 10px;
+		border: 2px solid #ccc;
+		border-radius: 8px;
+		text-align: center;
+		font-weight: bold;
+		background-color: rgb(247, 74, 39); /* Default background color for incorrect answers */
+		color: white; /* Default text color for incorrect answers */
+	}
+
+	.correct {
+		background-color: green;
+		color: white;
+		border-color: green;
 	}
 
 	.heading {
