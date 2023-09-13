@@ -7,7 +7,7 @@
 		const { data: quizData, error } = await supabase
 			.from('questionsTable')
 			.select('question_id, Question, optionsTable(answer_text, is_correct)')
-			.order('question_id');
+			.order('question_id'); //Order the questions by ID
 
 		if (quizData) {
 			data = quizData;
@@ -20,6 +20,11 @@
 	}
 
 	getQuizQuestions();
+
+	function getCorrectAnswer(optionsTable) {
+		const correctAnswer = optionsTable.find((option) => option.is_correct);
+		return correctAnswer ? correctAnswer.answer_text : 'No correct answer specified';
+	}
 </script>
 
 <div class="heading">
@@ -29,19 +34,23 @@
 <div class="quiz-container">
 	{#each data as question}
 		<div class="question">{question.question_id}: {question.Question}:</div>
-		<div class="answer-container">
-			{#each question.optionsTable as option}
-				<div class="answer" class:correct={option.is_correct}>
-					{option.answer_text}
-				</div>
-			{/each}
+		<div class="answer">
+			<ol>
+				<li>{question.optionsTable[0].answer_text}</li>
+				<li>{question.optionsTable[1].answer_text}</li>
+				<li>{question.optionsTable[2].answer_text}</li>
+				<li>{question.optionsTable[3].answer_text}</li>
+			</ol>
+		</div>
+		<div class="correct-answer">
+			Correct Answer: {getCorrectAnswer(question.optionsTable)}
 		</div>
 	{/each}
 </div>
 
 <style>
 	.quiz-container {
-		max-width: 600px;
+		max-width: 700px;
 		margin: 0 auto;
 		background-color: #ffffff;
 		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -56,32 +65,19 @@
 		padding-top: 20px;
 	}
 
-	.answer-container {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px; /* Adjust the gap between answers as needed */
-	}
-
 	.answer {
-		flex: 1;
-		padding: 10px;
-		border: 2px solid #ccc;
-		border-radius: 8px;
-		text-align: center;
-		font-weight: bold;
-		background-color: rgb(247, 74, 39); /* Default background color for incorrect answers */
-		color: white; /* Default text color for incorrect answers */
-	}
-
-	.correct {
-		background-color: green;
-		color: white;
-		border-color: green;
+		display: flex;
+		align-items: center;
+		margin-bottom: 8px;
 	}
 
 	.heading {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.correct-answer {
+		display: flex;
 	}
 </style>
